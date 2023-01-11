@@ -1,0 +1,241 @@
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.*;
+
+
+
+public class Ex2_1 {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {//the main is only for checking
+        int seed = 9;
+        int bound = 100;
+        int num = 10000;
+        String[] arr = new String[num];
+        arr = createTextFile(num, seed, bound);//check function 1
+
+        long start1=System.currentTimeMillis();
+        System.out.println("num of line is:" + getNumOfLines(arr));
+        long end1=System.currentTimeMillis();
+        System.out.println("time1 is: "+(end1-start1)*0.001);
+
+        long start2=System.currentTimeMillis();
+        System.out.println("func2 num of line is:" + getNumOfLinesThread2(arr));//check function 3
+        long end2=System.currentTimeMillis();
+        System.out.println("time2 is: "+(end2-start2)*0.001);
+
+        long start3=System.currentTimeMillis();
+        System.out.println("func3 num of line is:" + getNumOfLinesCallable3(arr));
+        long end3=System.currentTimeMillis();
+        System.out.println("time3 is: "+(end3-start3)*0.001);
+
+    }
+
+    /**
+     *
+     * @param n is the number of files we want to create
+     * @param seed
+     * @param bound is the bound of the number of lines in each file
+     * @return array of names of file
+     */
+    public static String[] createTextFile(int n, int seed, int bound) {
+        //int numOfLines= (int)(Math.random()*1000);//need to change
+        Random rand = new Random(seed);
+
+        String[] arr = new String[n];//array of files name
+        String fileName = "C:\\Users\\מתן\\Documents\\אוניברסיטה\\שנה ב 2022-2023\\סימסטר א\\תכנות מונחה עצמים\\מטלות\\מטלה 2\\matala02\\src\\zevel\\file_";//this is the path to where we want to save the new files
+        int i = 0;
+        File newFile;
+
+        /**
+         * create the files and write in them
+         */
+        while (i < n) {
+            /**
+             * create the files
+             */
+            //System.out.println(("char is: "+chari));
+            fileName = fileName + i + ".txt";
+            //System.out.println("file name is: "+fileName);
+            try {
+                newFile = new File(fileName);//create new file
+                if (newFile.createNewFile()) {
+                    //System.out.println("File created: " + myObj.getName());
+                } else {
+                    System.out.println("File already exists.");
+                }
+            } catch (IOException e) {
+                System.out.println("An error occurred.");
+                e.printStackTrace();
+            }
+            arr[i] = fileName;
+            fileName = "C:\\Users\\מתן\\Documents\\אוניברסיטה\\שנה ב 2022-2023\\סימסטר א\\תכנות מונחה עצמים\\מטלות\\מטלה 2\\matala02\\src\\zevel\\file_";
+            i++;
+        }
+        /**
+         *write in the files
+         */
+        String line = "hello world";//the sentence we will write in each line
+        i = 0;
+        int j = 0;
+        int numOfLines = 0;
+        FileWriter write;
+        while (i < arr.length) {
+            //System.out.println(arr[i]);
+            try {
+                write = new FileWriter(arr[i]);
+                numOfLines = rand.nextInt(bound);//defined the numbers of lines in the file
+                while (j < numOfLines) {
+                    write.write(line);//write the sentence in the line
+                    if (j < numOfLines - 1)
+                        write.write("\n");
+                    j++;
+                }
+                j = 0;
+                write.close();
+                //System.out.println("Successfully wrote to the file.");
+            } catch (IOException e) {
+                System.out.println("An error occurred.");
+                e.printStackTrace();
+            }
+            i++;
+        }
+        System.out.println("finish");
+        return arr;
+    }
+
+    /**
+     * this is the first method to get the numbers of lines in all the files
+     */
+    public static int getNumOfLines(String[] fileNames) {
+        int i = 0;
+        int lines = 0;//counter of lines in a file
+        int counter = 0;//counter of lines in all the files
+        while (i < fileNames.length) {
+            lines = 0;
+            try (BufferedReader line = new BufferedReader(new FileReader(fileNames[i]))) {
+                while (line.readLine() != null) {
+                    lines++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            counter = counter + lines;
+            i++;
+        }
+        return counter;
+    }
+
+    /**
+     * fileNames is array of files names
+     * @return number of lines in the files
+     * @throws InterruptedException
+     */
+
+    public static int getNumOfLinesThread2(String[]filesname) throws InterruptedException {
+        int i=0;
+        int counterOfLines=0;
+        numoflinesT [] thread=new numoflinesT[filesname.length];//array of threads
+        while (i<filesname.length){
+            thread[i]=new numoflinesT("t",filesname[i]);//for each file create new thread
+            thread[i].run();//count the lines in the file
+            i++;
+        }
+        i=0;
+        while (i<thread.length){
+            if(thread[i].isAlive()){
+                thread[i].join();//if the thread still alive wait to finish
+            }
+            counterOfLines=counterOfLines+thread[i].getNum();
+            i++;
+        }
+        return counterOfLines;
+    }
+
+
+    /**
+     * thread
+     */
+    static class numoflinesT extends Thread {
+        private String nameOfFile;
+        private String name;
+        private int num;
+
+        public numoflinesT(String name, String nameOfFile) {//constructor
+            super();
+            this.name = name;
+            this.nameOfFile = nameOfFile;
+        }
+
+        public void run() {//calculate the number of lines in the file
+            int lines = 0;
+            try (BufferedReader line = new BufferedReader(new FileReader(this.nameOfFile))) {
+                while (line.readLine() != null) {
+                    this.num++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        public int getNum() {
+            return this.num;
+        }//return the number of lines in the file
+    }
+
+    /**
+     * callable
+     */
+    static class callableNumOfLines implements Callable<Integer> {
+        String nameOfFile;
+
+        public callableNumOfLines(String nameOfFile) {//constructor
+            super();
+            this.nameOfFile = nameOfFile;
+        }
+
+        @Override
+        public Integer call() throws Exception {//calculate the number pf lines in the file
+            int counter = 0;
+            int lines = 0;
+            try (BufferedReader line = new BufferedReader(new FileReader(this.nameOfFile))) {
+                while (line.readLine() != null) {
+                    counter++;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return counter;
+        }
+    }
+
+    /**
+     * @param filesName
+     * @return
+     */
+
+    public static int getNumOfLinesCallable3(String[] filesName) throws InterruptedException, ExecutionException {
+        int i=0;
+        int counter=0;
+        try {
+            ExecutorService executor = Executors.newFixedThreadPool(filesName.length);//thread pool
+            List< callableNumOfLines> arr = new ArrayList<>();
+            while (i < filesName.length) {
+                arr.add(new callableNumOfLines(filesName[i]));
+                i++;
+            }
+            ArrayList<Future<Integer>> resultList=null;
+            resultList= (ArrayList<Future<Integer>>) executor.invokeAll(arr);//save the results of the threads
+            for(Future<Integer> num:resultList){
+                counter=counter+num.get();
+            }
+            executor.shutdown();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return counter;//change that
+    }
+    }
