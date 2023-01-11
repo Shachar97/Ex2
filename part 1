@@ -38,7 +38,7 @@ public class Ex2_1 {
      * @param bound is the bound of the number of lines in each file
      * @return array of names of file
      */
-    public static String[] createTextFile(int n, int seed, int bound) {
+    public static String[] createTextFile(int n, int seed, int bound) {//static is only for checking the fun from the main
         //int numOfLines= (int)(Math.random()*1000);//need to change
         Random rand = new Random(seed);
 
@@ -107,7 +107,7 @@ public class Ex2_1 {
     /**
      * this is the first method to get the numbers of lines in all the files
      */
-    public static int getNumOfLines(String[] fileNames) {
+    public static int getNumOfLines(String[] fileNames) {//static is only for checking the fun from the main
         int i = 0;
         int lines = 0;//counter of lines in a file
         int counter = 0;//counter of lines in all the files
@@ -132,7 +132,7 @@ public class Ex2_1 {
      * @throws InterruptedException
      */
 
-    public static int getNumOfLinesThread2(String[]filesname) throws InterruptedException {
+    public static int getNumOfLinesThread2(String[]filesname) throws InterruptedException {//static is only for checking the fun from the main
         int i=0;
         int counterOfLines=0;
         numoflinesT [] thread=new numoflinesT[filesname.length];//array of threads
@@ -156,7 +156,7 @@ public class Ex2_1 {
     /**
      * thread
      */
-    static class numoflinesT extends Thread {
+    static class numoflinesT extends Thread {//static is only for checking the fun from the main
         private String nameOfFile;
         private String name;
         private int num;
@@ -215,7 +215,7 @@ public class Ex2_1 {
      * @return
      */
 
-    public static int getNumOfLinesCallable3(String[] filesName) throws InterruptedException, ExecutionException {
+    public static int getNumOfLinesCallable3(String[] filesName) throws InterruptedException, ExecutionException {//static is only for checking the fun from the main
         int i=0;
         int counter=0;
         try {
