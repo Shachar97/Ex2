@@ -1,5 +1,5 @@
 # Ex2
-matala02 part 1 Ex2_1 readMe:
+## part 1 Ex2_1 :
  In the first function we created text files. Then we write in each one of them random number of lines.
  
 In the 2 function we calculate the number of lines in all the files together by loop in loop,
@@ -24,4 +24,11 @@ the first method is the worst because it waits to the end of calculation of file
 but the others methods do the calculations of the files in concurrently and because of that they are more faster. 
 We can conclude from this project that when we have multi tasks that we need to perform,
 and they don’t dependent on each other we should use in threads(and threads pool) for shorten running time.    
- 
+
+## matala02 part 2:
+### Task
+The Task class implement from Callable and Comparable interfaces and extern from FutureTask.
+task member is like FutureTask member with the different that we can compare between tasks by their priority's.
+so in the field of Task, we have TaskType for the priority,a Callable member type for the call func, and a Generic member, so the task could be from different types.
+### CustomExecutor
+the CustomExecutor class is an executor for the Task class, so he has a priority blocking queue. and executor-pool for the threads, in this case ThreadPoolExecutor type.
